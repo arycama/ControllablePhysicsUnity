@@ -1,50 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MovementTest : MonoBehaviour
 {
-    [SerializeField] private float maxAcceleration = 1f;
-    [SerializeField] private int iterations = 3;
-    [SerializeField] private Rigidbody rigidbody;
+    [SerializeField] private float acceleration = 1f;
     [SerializeField] private Camera camera;
+    [SerializeField] private Rigidbody rigidbody;
 
-    private Vector3 targetPosition;
+    private float target;
 
     private void Update()
     {
-        if (!Input.GetMouseButtonDown(0))
-            return;
-
-        var ray = camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out var hit))
+        if (Input.GetMouseButtonDown(0))
         {
-            targetPosition = hit.point;
+            if (Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out var hit))
+            {
+                target = hit.point.x;
+            }
         }
     }
 
     private void FixedUpdate()
     {
-        var futurePosition = rigidbody.position + rigidbody.velocity * Time.fixedDeltaTime;
-        var futureVelocity = rigidbody.velocity;
-        var force = Vector3.zero;
+        // Need to find correct value for this
+        var t = Time.fixedDeltaTime;
+        var position = rigidbody.position.x;
 
-        for (var i = 0; i < iterations; i++)
-        {
-            var targetDistance = Vector3.Distance(targetPosition, futurePosition);
-            if (targetDistance < 1e-3f)
-                break;
+        var distance = Mathf.Abs(target - position);
+        var targetVelocity = Mathf.Sqrt(2f * acceleration * distance) * Mathf.Sign(target - position);
+        var velocityDelta = targetVelocity - rigidbody.velocity.x;
+        var force = Mathf.Clamp(velocityDelta / t, -acceleration, acceleration);
 
-            var targetDirection = Vector3.Normalize(targetPosition - futurePosition);
-            var targetVelocity = Mathf.Sqrt(2.0f * maxAcceleration * targetDistance) * targetDirection;
-
-            var velocityDelta = (targetVelocity - futureVelocity) / Time.fixedDeltaTime;
-            force = Vector3.ClampMagnitude(velocityDelta, maxAcceleration);
-
-            futureVelocity = rigidbody.velocity + force * Time.fixedDeltaTime;
-        }
-
-        rigidbody.AddForce(force, ForceMode.Acceleration);
-
+        rigidbody.AddForce(force, 0f, 0f, ForceMode.Acceleration);
     }
 }
