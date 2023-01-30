@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &41276910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +157,7 @@ MonoBehaviour:
   test: 0
   rigidbody: {fileID: 41276913}
   camera: {fileID: 963194227}
+  force: 0
 --- !u!4 &41276912
 Transform:
   m_ObjectHideFlags: 0
@@ -311,7 +312,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 25cac52b31acb6346a74cff211e59ad6, type: 2}
+  - {fileID: 2100000, guid: 62fb0fdfbc84132438bae3a4e289d6a1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -652,6 +653,7 @@ MonoBehaviour:
   test: 1
   rigidbody: {fileID: 1254600064}
   camera: {fileID: 963194227}
+  force: 0
 --- !u!54 &1254600064
 Rigidbody:
   m_ObjectHideFlags: 0

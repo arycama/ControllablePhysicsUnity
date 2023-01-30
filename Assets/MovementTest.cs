@@ -40,26 +40,21 @@ public class MovementTest : MonoBehaviour
         var dt = Time.fixedDeltaTime;
         var x = distance;
 
-        // This accounts for the error introduced by dt
-        var currentSpeed = 0.5f * a * (Sqrt((a * dt * dt + 8f * x) / a) - dt);
-
-        // Time to reach target at current distance+ideal velocity
+        // Calculate how long we would have to accelerate from 0 to reach our current distance
         var currentTime = (Sqrt(a * a * dt * dt + 8 * a * x) - a * dt) / (2 * a);
 
-        // One frame forward
+        // Move one frame forward
         var nextTime = currentTime - dt;
 
         // This is the distance goal for the next frame/timestep
-        var nextDistance = 0.5f * a * nextTime * (nextTime + dt);
+        var nextDistance = a * nextTime * (nextTime + dt) / 2f;
 
         // Now calcualte the speed required to get us to the target distance
-        var targetDisplacement = Abs(nextDistance - distance);
-        var targetSpeed = 2 * targetDisplacement / dt - currentSpeed;
-
+        var targetSpeed = 0.5f * a * (Sqrt((a * dt * dt + 8f * nextDistance) / a) - dt);
 
         var velocityDelta = (targetSpeed * targetDirection - rigidbody.velocity) / dt;
         var force = ClampMagnitude(velocityDelta, a);
-        this.force = force.magnitude;
+
         rigidbody.AddForce(force, ForceMode.Acceleration);
     }
 }
