@@ -9,52 +9,61 @@ public class MovementTest : MonoBehaviour
     [SerializeField] private Rigidbody rigidbody;
     [SerializeField] private Camera camera;
 
-    private Vector3 targetPosition;
+    public Vector3 targetPosition;
 
     private void OnEnable()
     {
-        targetPosition = transform.position;
+        //targetPosition = transform.position;
     }
 
     private void Update()
     {
-        //if (!Input.GetMouseButtonDown(0))
-       //     return;
+        if (!Input.GetMouseButtonDown(0))
+            return;
 
         var ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out var hit))
         {
-            //targetPosition = new Vector3(hit.point.x, rigidbody.position.y, rigidbody.position.z);
+           // targetPosition = new Vector3(hit.point.x, rigidbody.position.y, rigidbody.position.z);
             targetPosition = hit.point;
         }
     }
 
-    public float force;
+    public float distance, distanceSoFar, halfPoint, totalDistance, targetSpeed, force, currentT, futureT, futureDistance;
 
     private void FixedUpdate()
     {
+        var v = Magnitude(rigidbody.velocity);
         var targetDirection = Normalize(targetPosition - rigidbody.position);
-        var distance = Distance(targetPosition, rigidbody.position);
-
+        distance = Distance(targetPosition, rigidbody.position) - v * Time.fixedDeltaTime; // Quick hack to simulate 1 frame ahead, otherwise we start at 0
         var a = acceleration;
-        var dt = Time.fixedDeltaTime;
         var x = distance;
 
-        // Calculate how long we would have to accelerate from 0 to reach our current distance
-        var currentTime = (Sqrt(a * a * dt * dt + 8 * a * x) - a * dt) / (2 * a);
+        distanceSoFar = Sq(v) * Rcp(2 * a);
+        totalDistance = distance + distanceSoFar;
+        halfPoint = Sqrt(totalDistance / a);
 
-        // Move one frame forward
-        var nextTime = currentTime - dt;
+        // We need to check ahead of time, so first, calculate our total travel time, and step forward.
+        //currentT = Sqrt(2 * x / a);
+        currentT = 2 * halfPoint - Sqrt(2 * halfPoint * halfPoint - 2 * x / a);
 
-        // This is the distance goal for the next frame/timestep
-        var nextDistance = a * nextTime * (nextTime + dt) / 2f;
+        futureT = currentT - Time.fixedDeltaTime;
 
-        // Now calcualte the speed required to get us to the target distance
-        var targetSpeed = 0.5f * a * (Sqrt((a * dt * dt + 8f * nextDistance) / a) - dt);
+        futureDistance = totalDistance - 0.5f * a * Sq(futureT - 2 *  halfPoint);
 
-        var velocityDelta = (targetSpeed * targetDirection - rigidbody.velocity) / dt;
-        var force = ClampMagnitude(velocityDelta, a);
+        if (futureDistance  >= halfPoint)
+            targetSpeed = Sqrt(2 * a * (totalDistance - futureDistance));
+        else
+            targetSpeed = Sqrt(2 * a * futureDistance);
 
-        rigidbody.AddForce(force, ForceMode.Acceleration);
+        //force = Clamp((targetSpeed - v) / Time.fixedDeltaTime, -a, a);
+        // rigidbody.AddForce(force * targetDirection, ForceMode.Acceleration);
+
+        force = (rigidbody.velocity.magnitude - targetSpeed) / Time.fixedDeltaTime;
+
+        rigidbody.velocity = targetSpeed* targetDirection;
     }
+
+    public static float Sq(float x) => x * x;
+    public static float Rcp(float x) => 1f / x;
 }
