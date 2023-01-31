@@ -2,53 +2,24 @@ using UnityEngine;
 
 public class HovershipEngine : MonoBehaviour
 {
-    [SerializeField]
-    private float movementSpeed;
-
-    [SerializeField]
-    private float elevationSpeed = 50f;
-
-    [SerializeField]
-    private float rotationSpeed;
-
-    [SerializeField]
-    private float pitchSpeed = 30f;
-
-    [SerializeField, Range(0f, 90f)]
-    private float strafePitch = 15f;
-
-    [SerializeField, Range(0f, 90f)]
-    private float boostPitch = 60f;
-
-    [SerializeField, Range(0f, 90f)]
-    private float strafeRoll = 15f;
-
-    [SerializeField, Range(0f, 90f)]
-    private float boostRoll = 75f;
+    [SerializeField] private float movementSpeed = 50f;
+    [SerializeField] private float elevationSpeed = 50f;
+    [SerializeField] private float rotationSpeed = 50f;
+    [SerializeField] private float pitchSpeed = 30f;
+    [SerializeField, Range(0f, 90f)] private float strafePitch = 15f;
+    [SerializeField, Range(0f, 90f)] private float boostPitch = 60f;
+    [SerializeField, Range(0f, 90f)] private float strafeRoll = 15f;
+    [SerializeField, Range(0f, 90f)] private float boostRoll = 75f;
 
     [Header("References")]
-    [SerializeField]
-    private Rigidbody rigidbody;
-
-    [SerializeField]
-    private Transform camera;
+    [SerializeField] private Rigidbody rigidbody;
+    [SerializeField] private Transform camera;
 
     private void FixedUpdate()
     {
         var moveInput = new Vector2(Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f), Input.GetKey(KeyCode.W) ? 1f : (Input.GetKey(KeyCode.S) ? -1f : 0f));
         var elevationInput = Input.GetKey(KeyCode.Space) ? 1f : (Input.GetKey(KeyCode.LeftControl) ? -1f : 0f);
         var boostInput = Input.GetKey(KeyCode.LeftShift) ? 1f : 0f;
-
-        //if (boostInput > 0f)
-        //{
-        //    flightCamera.Priority = 10;
-        //    hoverCamera.Priority = 0;
-        //}
-        //else
-        //{
-        //    flightCamera.Priority = 0;
-        //    hoverCamera.Priority = 10;
-        //}
 
         // Some constants
         var angularDrag = rigidbody.angularDrag;
