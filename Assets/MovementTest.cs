@@ -1,6 +1,4 @@
 using UnityEngine;
-using static UnityEngine.Mathf;
-using static UnityEngine.Vector3;
 
 public class MovementTest : MonoBehaviour
 {
@@ -11,11 +9,6 @@ public class MovementTest : MonoBehaviour
 
     public Vector3 targetPosition;
 
-    private void OnEnable()
-    {
-        //targetPosition = transform.position;
-    }
-
     private void Update()
     {
         if (!Input.GetMouseButtonDown(0))
@@ -24,45 +17,48 @@ public class MovementTest : MonoBehaviour
         var ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out var hit))
         {
-            // targetPosition = new Vector3(hit.point.x, rigidbody.position.y, rigidbody.position.z);
             targetPosition = hit.point;
         }
     }
 
-    public float force;
-
     private void FixedUpdate()
     {
-        var v = Magnitude(rigidbody.velocity);
-        var targetDirection = Normalize(targetPosition - rigidbody.position);
-        var distance = Distance(targetPosition, rigidbody.position);
         var a = acceleration;
-        var p = distance; // plus t?
+        var v = rigidbody.velocity.magnitude;
+        var p = Vector3.Distance(targetPosition, rigidbody.position);
 
-        var start = v * v / (2 * a) + p;
-        var half = v * v / (4 * a) + 0.5f * p;
-        var t = Sqrt(start / a);
+        var p0 = v * v / (2 * a) + p;
+        var h = v * v / (2 * a) + p / 2;
 
-        float targetV;
-        if (p > half)
-        {
-            var time = 2 * t - Sqrt(2 * t * t - 2 * p / a) - Time.fixedDeltaTime;
-            var newDistance = start - 0.5f * a * Sq(time - 2 * t);
-            targetV = Sqrt(2f * a * (start - newDistance));
-        }
-        else
-        {
-            var time = Sqrt(2 * p / a) - Time.fixedDeltaTime;
-            var newDistance = 0.5f * a * time * time;
-            targetV = Sqrt(2f * a * newDistance);
-        }
+        var t = Mathf.Sqrt(p0 / a);
+        var t0 = Mathf.Sqrt(2 * p / a);
 
-        var f = (targetDirection * targetV - rigidbody.velocity) / Time.fixedDeltaTime;
-        var vel = ClampMagnitude(f, acceleration);
-        force = vel.magnitude;
-        rigidbody.AddForce(vel, ForceMode.Acceleration);
+        // Max required because when velocity is zero, floating point errors may result in this being slightly less than 0, causing a NaN
+        var t1 = 2 * t - Mathf.Sqrt(Mathf.Max(0f, 2 * Sq(t) - 2 * p / a));
+
+        var time = p <= h ? t0 : t1;
+        time -= Time.fixedDeltaTime;
+
+        var y0 = 0.5f * a * Sq(time);
+        var y1 = p0 - 0.5f * a * Sq(time - 2f * t);
+        var y = p < t ? y0 : y1;
+
+        var targetDisplacement = Mathf.Abs(p - y);
+
+        var targetDirection = Vector3.Normalize(targetPosition - rigidbody.position);
+        var force = 2f * (targetDisplacement - v * Time.fixedDeltaTime) / Sq(Time.fixedDeltaTime);
+
+        var clampedForce = Vector3.ClampMagnitude(targetDirection * force, acceleration);
+        //var clampedForce = targetDirection * force;
+
+
+        rigidbody.AddForce(clampedForce, ForceMode.Acceleration);
+
+        //var targetVelocity = targetDisplacement ;
+        //var velocityDelta = Vector3.ClampMagnitude((targetDirection * targetVelocity - rigidbody.velocity) / Time.fixedDeltaTime, acceleration);
+        //rigidbody.AddForce(velocityDelta, ForceMode.Acceleration);
+
     }
 
     public static float Sq(float x) => x * x;
-    public static float Rcp(float x) => 1f / x;
 }

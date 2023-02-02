@@ -153,20 +153,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38fd9d19af6d09f46ab2e11ed4a53d0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 1
+  acceleration: 5
   test: 0
   rigidbody: {fileID: 41276913}
   camera: {fileID: 963194227}
   targetPosition: {x: 0, y: 0, z: 0}
-  distance: 0
-  distanceSoFar: 0
-  halfPoint: 0
-  totalDistance: 0
-  targetSpeed: 0
-  force: 0
-  currentT: 0
-  futureT: 0
-  futureDistance: 0
 --- !u!4 &41276912
 Transform:
   m_ObjectHideFlags: 0
@@ -681,15 +672,6 @@ MonoBehaviour:
   rigidbody: {fileID: 1254600064}
   camera: {fileID: 963194227}
   targetPosition: {x: 0, y: 0, z: 0}
-  distance: 0
-  distanceSoFar: 0
-  halfPoint: 0
-  totalDistance: 0
-  targetSpeed: 0
-  force: 0
-  currentT: 0
-  futureT: 0
-  futureDistance: 0
 --- !u!54 &1254600064
 Rigidbody:
   m_ObjectHideFlags: 0
