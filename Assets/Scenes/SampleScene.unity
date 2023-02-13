@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -157,7 +157,20 @@ MonoBehaviour:
   test: 0
   rigidbody: {fileID: 41276913}
   camera: {fileID: 963194227}
+  v: 3.699508
+  p: 2.594161
   targetPosition: {x: 0, y: 0, z: 0}
+  p0: 0
+  h: 0
+  t: 0
+  t0: 0
+  t1: 0
+  time: 0
+  y0: 0
+  y1: 0
+  y: 0
+  targetDisplacement: 0
+  force: 0
 --- !u!4 &41276912
 Transform:
   m_ObjectHideFlags: 0
@@ -671,7 +684,20 @@ MonoBehaviour:
   test: 1
   rigidbody: {fileID: 1254600064}
   camera: {fileID: 963194227}
+  v: 0
+  p: 0
   targetPosition: {x: 0, y: 0, z: 0}
+  p0: 0
+  h: 0
+  t: 0
+  t0: 0
+  t1: 0
+  time: 0
+  y0: 0
+  y1: 0
+  y: 0
+  targetDisplacement: 0
+  force: 0
 --- !u!54 &1254600064
 Rigidbody:
   m_ObjectHideFlags: 0
