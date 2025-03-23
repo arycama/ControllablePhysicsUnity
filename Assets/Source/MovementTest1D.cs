@@ -27,7 +27,7 @@ public class MovementTest1D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var force = PhysicsExtensions.AccelerateToTarget(velocity, transform.position.x, target, acceleration, Time.fixedDeltaTime,test);
+        var force = PhysicsExtensions.AccelerateToTarget(velocity, transform.position.x, target, acceleration, Time.fixedDeltaTime);
 
         accel = force;
 

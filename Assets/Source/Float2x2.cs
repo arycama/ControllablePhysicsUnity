@@ -2,19 +2,15 @@
 
 public struct Float2x2
 {
-    public float m00, m10, m01, m11;
+    public Float2 c0, c1;
 
-    public Float2x2(float m00, float m10, float m01, float m11)
+    public Float2x2(Float2 c0, Float2 c1)
     {
-        this.m00 = m00;
-        this.m10 = m10;
-        this.m01 = m01;
-        this.m11 = m11;
+        this.c0 = c0;
+        this.c1 = c1;
     }
 
-    public static Float2x2 Rotate(float theta)
+    public Float2x2(float m00, float m01, float m10, float m11) : this(Float2(m00, m10), Float2(m01, m11))
     {
-        SinCos(theta, out var sinTheta, out var cosTheta);
-        return new(cosTheta, -sinTheta, sinTheta, cosTheta);
     }
 }

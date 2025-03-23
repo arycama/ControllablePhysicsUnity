@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
-using static System.MathF;
-using static MathExtensions;
+using static Math;
 
 public static class PhysicsExtensions
 {
@@ -36,29 +34,22 @@ public static class PhysicsExtensions
     }
 
     // Calculates an acceleration force to reach a target without overshooting
-    public static float AccelerateToTarget(float velocity, float position, float target, float acceleration, float deltaTime, bool test = false)
+    public static float AccelerateToTarget(float velocity, float position, float target, float acceleration, float deltaTime)
     {
         var delta = target - position;
-        var distance = Abs(delta);
-        var direction = Sign(delta);
-        var speed = (velocity) * direction;
+        var slowdownDistance = (2 * acceleration * delta - Square(velocity)) / (4 * acceleration);
 
-        var slowdownDistance = (2 * acceleration * distance - speed * speed) / (4 * acceleration);
-        SolveQuadratic(0.5f * acceleration, speed, -slowdownDistance, out _, out var slowdownTime);
+        var slowdownTime0 = (-velocity + Sqrt(Square(velocity) + 2 * acceleration * slowdownDistance)) / acceleration;
+        var slowdownTime1 = (velocity + Sqrt(0.5f * Square(velocity) - acceleration * delta)) / acceleration;
 
-        float targetSpeed;
-        if (slowdownTime < 0)
-            targetSpeed = -acceleration * deltaTime;
-        else
-            targetSpeed = acceleration * (slowdownTime - Abs(deltaTime - slowdownTime));
+        var v0 = +acceleration * slowdownTime0 - acceleration * Abs(deltaTime - slowdownTime0);
+        var v1 = -acceleration * slowdownTime1 + acceleration * Abs(deltaTime - slowdownTime1);
 
-        if (test)
-            return targetSpeed / deltaTime * direction;
+        var v2 = slowdownTime1 < 0 ? v0 : v1;
+        var v3 = slowdownTime0 < 0 ? v1 : v0;
+        var v4 = delta < 0 ? v2 : v3;
 
-        var targetVelocity = direction * (targetSpeed + speed);
-        var force = (targetVelocity - velocity) / deltaTime;
-
-        return Math.Clamp(force, -acceleration, acceleration);
+        return v4 / deltaTime;
     }
 
     public static float AccelerateToTarget(float velocity, float position, float target, float acceleration)
@@ -126,23 +117,44 @@ public static class PhysicsExtensions
         // Clamp to max accel
         return Vector3.ClampMagnitude(force, acceleration);
 #else
-        var distance = Vector3.Distance(position, target);
-        var speed = velocity.magnitude;
-        var slowdownDistance = (2 * acceleration * distance - speed * speed) / (4 * acceleration);
+        var delta = target - position;
 
-        SolveQuadratic(0.5f * acceleration, speed, -slowdownDistance, out _, out var slowdownTime);
+        var speed = Vector3.Dot(delta.normalized, velocity);
+        var distance = Vector3.Dot(velocity.normalized, delta);
 
-        float targetSpeed;
-        if (slowdownTime < 0)
-            targetSpeed = speed - acceleration * deltaTime;
-        else
-            targetSpeed = speed + acceleration * (slowdownTime - Abs(deltaTime - slowdownTime));
+        var slowdownDistance = (2 * acceleration * distance - Square(speed)) / (4 * acceleration);
 
-        var direction = (target - position).normalized;
-        var targetVelocity = direction * targetSpeed;
-        var force = (targetVelocity - velocity) / deltaTime;
+        var slowdownTime0 = (-speed + Sqrt(Square(speed) + 2 * acceleration * slowdownDistance)) / acceleration;
+        var slowdownTime1 = (speed + Sqrt(0.5f * Square(speed) - acceleration * distance)) / acceleration;
 
-        return Vector3.ClampMagnitude(force, acceleration);
+        var v0 = +acceleration * slowdownTime0 - acceleration * Abs(deltaTime - slowdownTime0);
+        var v1 = -acceleration * slowdownTime1 + acceleration * Abs(deltaTime - slowdownTime1);
+
+        var v2 = slowdownTime1 < 0 ? v0 : v1;
+        var v3 = slowdownTime0 < 0 ? v1 : v0;
+        var v4 = distance < 0 ? v2 : v3;
+
+        return delta.normalized * v4 / deltaTime;
+
+
+
+        //var distance = Vector3.Distance(position, target);
+        //var speed = velocity.magnitude;
+        //var slowdownDistance = (2 * acceleration * distance - speed * speed) / (4 * acceleration);
+
+        //SolveQuadratic(0.5f * acceleration, speed, -slowdownDistance, out _, out var slowdownTime);
+
+        //float targetSpeed;
+        //if (slowdownTime < 0)
+        //    targetSpeed = speed - acceleration * deltaTime;
+        //else
+        //    targetSpeed = speed + acceleration * (slowdownTime - Abs(deltaTime - slowdownTime));
+
+        //var direction = (target - position).normalized;
+        //var targetVelocity = direction * targetSpeed;
+        //var force = (targetVelocity - velocity) / deltaTime;
+
+        //return Vector3.ClampMagnitude(force, acceleration);
 #endif
     }
 
